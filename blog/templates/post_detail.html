@@ -1,0 +1,29 @@
+<!-- templates/post_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+
+<div class="post-entry">
+	<h2>{{ post.title }}</h2>
+	<p>{{ post.body }}</p>
+</div>
+
+<p><a href="{% url 'post_edit' post.pk %}">Edit Post</a></p>
+<p><a href="{% url 'post_delete' post.pk %}">Delete Post</a></p>
+
+<hr>
+	<h4>Comments</h4>
+	{% if post.comment_set.all.count == 0 %}
+		<p>No comments yet!</p>
+	{% else %}
+		{% for comment in post.comment_set.all %}
+			<p>{{ comment.author }}: {{ comment }}</p>
+		{% endfor %}
+	{% endif %}
+<hr>
+<h4>Add a comment</h4>
+<form method="post">{% csrf_token %}
+          {{ form.as_p }}
+          <button>Post comment</button>
+</form>
+{% endblock content %}
+

@@ -1,0 +1,32 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+{% block content %}
+{% for post in post_list %}
+	<div class="post-entry">
+	<h2><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+	<p>{{ post.body }}</p>
+</div>
+{% endfor %}
+{% if page_obj.has_other_pages %}
+<div>
+<nav>
+	<ul>
+		{% if page_obj.has_previous %}
+			<a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+		{%endif%}
+		{% for p in paginator.page_range %}
+		{% if page_obj.number == p %}
+			<a>{{ p }}</a>
+		{% else %}
+			<a href="?page={{ p }}">{{ p }}</a>
+		{%endif%}
+		
+		{% endfor %}
+		{% if page_obj.has_next %}
+			<a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+		{%endif%}
+	</ul>
+</nav>
+</div>
+{% endif %}
+{% endblock content %}
