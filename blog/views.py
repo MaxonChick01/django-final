@@ -3,7 +3,11 @@ from django.views.generic import ListView, DetailView, FormView # new
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views import View
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.http import HttpResponseRedirect
+
+
 
 from .models import Post
 from .forms import CommentForm
@@ -74,6 +78,25 @@ class BlogDeleteView(DeleteView):
     template_name = "post_delete.html"
     success_url = reverse_lazy("home")
 
+def LikeView(request, pk):
+    post = get_object_or_404(Post, id=request.POST.get("post_pk"))
+    if not post.likes.filter(id=request.user.id).exists():
+        post.likes.add(request.user)
+        if post.dislikes.filter(id=request.user.id).exists():
+            post.dislikes.remove(request.user)
+
+    return HttpResponseRedirect(reverse("post_detail", kwargs={"pk": pk}))
+
+    
+    
+def DislikeView(request, pk):
+    post = get_object_or_404(Post, id=request.POST.get("post_pk"))
+    if not post.dislikes.filter(id=request.user.id).exists():
+        post.dislikes.add(request.user)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+
+    return HttpResponseRedirect(reverse("post_detail", kwargs={"pk": pk}))
 
 
 

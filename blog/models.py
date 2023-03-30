@@ -10,18 +10,30 @@ class Post(models.Model):
         on_delete=models.CASCADE,
     )
     body = models.TextField()
+    likes = models.ManyToManyField(
+        "auth.User",
+        related_name="likes",
+    )
 
+    dislikes = models.ManyToManyField(
+        "auth.User",
+        related_name="dislikes",
+    )
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"pk": self.pk})
 
+    def rate(self):
+        return self.likes.count() - self.dislikes.count()
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment = models.TextField()
     author = models.ForeignKey(
+
         "auth.User",
         on_delete=models.CASCADE,
     )
@@ -31,4 +43,5 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse("post_list")
+
 

@@ -3,15 +3,37 @@
 {% block content %}
 
 <div class="post-entry">
+<br>
 	<h2>{{ post.title }}</h2>
 	<p>{{ post.body }}</p>
+	<p>Автор: {{post.author.username}}</p>
 </div>
 
-<p><a href="{% url 'post_edit' post.pk %}">Edit Post</a></p>
-<p><a href="{% url 'post_delete' post.pk %}">Delete Post</a></p>
+
+
+{% if user.is_authenticated and request.user.id == post.author.id %}
+<p><a href="{% url 'post_edit' post.pk %}">Редактировать</a></p>
+<p><a href="{% url 'post_delete' post.pk %}">Удалить</a></p>
+{% endif %}
 
 <hr>
-	<h4>Comments</h4>
+	<h4>Рейтинг поста: {{post.rate}}</h4>
+	{% if user.is_authenticated %}
+	<form action="{% url 'post_like' post.pk %}" method="post">
+	{% csrf_token %}
+          <button type='submit' name='post_pk' value="{{post.pk}}">Класс ({{ post.likes.count }})</button>
+	</form>
+	<form action="{% url 'post_dislike' post.pk %}" method="post">
+	{% csrf_token %}
+          <button type='submit' name='post_pk' value="{{post.pk}}">Не Класс ({{ post.dislikes.count }})</button>
+	</form>
+	{% endif %}
+
+
+<hr>
+
+<hr>
+	<h4>Комментарии</h4>
 	{% if post.comment_set.all.count == 0 %}
 		<p>No comments yet!</p>
 	{% else %}
@@ -20,10 +42,12 @@
 		{% endfor %}
 	{% endif %}
 <hr>
-<h4>Add a comment</h4>
+{% if user.is_authenticated %}
+<h4>Комментировать</h4>
 <form method="post">{% csrf_token %}
           {{ form.as_p }}
-          <button>Post comment</button>
+          <button>Поделиться своим мнением</button>
 </form>
+{% endif %}
 {% endblock content %}
 
